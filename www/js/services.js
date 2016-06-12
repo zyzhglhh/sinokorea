@@ -1,9 +1,9 @@
 angular.module('yiyangbao.services', ['ngResource'])
 .constant('CONFIG', {
-  // baseUrl: 'http://web.go5le.net/',
-  baseUrl: '/',
-  // ioDefaultNamespace: 'web.go5le.net/default',
-  ioDefaultNamespace: 'localhost/default',
+  baseUrl: 'http://web.go5le.net/',
+  // baseUrl: '/',
+  ioDefaultNamespace: 'web.go5le.net/default',
+  // ioDefaultNamespace: 'localhost/default',
   consReceiptUploadPath: 'cons/receiptUpload',
   userResUploadPath: 'user/resUpload',
   cameraOptions: { 
