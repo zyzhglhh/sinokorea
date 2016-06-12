@@ -1,0 +1,45 @@
+<ion-view view-title="理赔进度查询">
+	<ion-content>
+		<ion-refresher pulling-text="释放刷新..." refreshing-text="正在刷新..." on-refresh="actions.doRefresh()"></ion-refresher>
+		
+		<ion-list ng-repeat="basicInfo in basicInfos">
+			<ion-item class="item-divider">
+				立案号:{{basicInfo.RgtNo}}
+				<span class="item-note">{{basicInfo.Status}}</span>
+			</ion-item>
+			<ion-item>
+				事故人
+				<span class="item-note">{{basicInfo.Name}}</span>				
+			</ion-item>
+
+			<ion-item>
+				客户号
+				<span class="item-note">{{basicInfo.InsuredNo}}</span>				
+			</ion-item>
+
+			<ion-item>
+				{{basicInfo.IDType}}
+				<span class="item-note">{{basicInfo.IDNo}}</span>				
+			</ion-item>
+
+
+			<div>
+				<ion-item class="item-divider">
+					理赔案件操作进度表
+					<ion-list>
+					<ion-item ng-repeat="mission in basicInfo.Missions">
+							<h2>{{mission.date}}</h2>
+							<p>{{mission.state}}</p>
+						</ion-item>
+				</ion-list>
+				</ion-item>
+			</div>
+			<ion-item class="item-body" ng-if="basicInfo.Status == '已结案'">
+				<h2>尊敬的***先生/女士：</h2>
+				<p>
+					您本次提交的关于**年**月**日所发生事故的索赔资料，经本公司审慎核定，现已理赔结案，赔付详情如下所示：您本次所提交的理赔申请材料中，医疗账单费用合计：***元，自理自负费用合计：**元，第三方给付费用合计：**元。依据保险合同的约定免赔额：**元，赔付比例为**%，经过审慎核定，保险责任内费用为：***元，您在本保险年度累计赔付达：***元。
+				</p>
+			</ion-item>
+		</ion-list>
+	</ion-content>
+</ion-view>

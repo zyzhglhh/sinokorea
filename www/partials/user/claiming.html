@@ -1,0 +1,61 @@
+<ion-view view-title="我要理赔">
+	<ion-content>
+
+		<ion-list>
+			
+      <ion-item class="item-input item-select">
+        <span class="input-label">被保险人:</span>
+        <select ng-options="relationType.value for relationType in config.relationTypes" ng-model="lp.relationType" ng-change="actions.chgRelationType()"></select>
+      </ion-item>
+
+      <ion-item class="item-input" >
+        <span class="input-label">被保人姓名:</span>
+          <input type="text" placeholder="请输入被保人姓名" ng-model="lp.truename" required="" name="truename" ng-disabled="true">
+        <!-- </div> -->
+      </ion-item>
+
+      <ion-item class="item-input">
+        <span class="input-label">身份证:</span>
+          <input type="text" placeholder="请输入身份证" ng-model="lp.idNo" required="" name="idNo" ng-disabled="true">
+        <!-- </div> -->
+      </ion-item>
+
+      <ion-item class="item-input">
+        <span class="input-label">手机电话:</span>
+          <input type="text" placeholder="请输入手机电话" ng-model="lp.mobile" required="" name="mobile" ng-disabled="true" >
+        <!-- </div> -->
+      </ion-item>
+
+      <ion-item class="item-toggle">
+         是否住院:
+         <label class="toggle toggle-positive">
+           <input type="checkbox" ng-model="lp.inHospital">
+           <div class="track">
+             <div class="handle"></div>
+           </div>
+         </label>
+      </ion-item>
+
+      <ion-item class="item-input">
+        <span class="input-label">出险日期:</span>
+          <input type="date" placeholder="请输入出险日期" ng-model="lp.accidentDate" required="" name="accidentDate" >
+        <!-- </div> -->
+      </ion-item>
+      <ion-item class="item-input item-stacked-label">
+        <span class="input-label">出险地点:</span>
+          <input type="text" placeholder="请输入出险地点(省\市\县\区域)" ng-model="lp.accidentSite" required="" name="accidentSite" >
+        <!-- </div> -->
+      </ion-item>
+
+      <ion-item>
+        <input type="checkbox" ng-model="lp.isReal">  
+        我已确定出险信息属实     
+      </ion-item>
+
+      <button class="button button-full button-stable" ng-click="actions.toContinue()">
+        下一步
+      </button>
+
+		</ion-list>
+	</ion-content>
+</ion-view>

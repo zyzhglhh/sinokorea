@@ -1,0 +1,59 @@
+<ion-view view-title="上传资料">
+	<ion-content>
+		<ion-list>
+			<ion-item>
+				被保险人
+				<span class="item-note">{{lp.relationType.value}}</span>
+			</ion-item>
+
+			<ion-item>
+				被保人姓名
+				<span class="item-note">{{lp.truename}}</span>
+			</ion-item>
+			<ion-item>
+				被保人身份证
+				<span class="item-note">{{lp.idNo}}</span>
+			</ion-item>
+			<ion-item>
+				被保人电话
+				<span class="item-note">{{lp.mobile}}</span>
+			</ion-item>
+			<ion-item>
+				是否住院
+				<span class="item-note">{{lp.inHospital ? '是' : '否'}}</span>
+			</ion-item>
+			<ion-item>
+				出险日期
+				<span class="item-note">{{lp.accidentDate | date: 'yyyy年MM月dd日'}}</span>
+			</ion-item>
+			<ion-item>
+				出险地点
+				<p><span class="item-note">{{lp.accidentSite}}</span></p>
+			</ion-item>
+
+			
+			
+		</ion-list>
+
+		<ion-list>
+			<ion-item class="item-divider">上传资料</ion-item>
+			<ion-item class="item-body" ng-repeat="uploadimg in uploadImages">
+				<a >
+				{{uploadimg.title}}
+					<span class="item-note ion-ios-upload-outline"></span>
+				</a>
+				<p ng-if="!imagePages[uploadimg.id]">{{uploadimg.description}}</p>
+				<div ng-if="imagePages[uploadimg.id]" ng-repeat="imgpage in imagePages[uploadimg.id]">
+					<img ng-src="{{imgpage.ImageUrl}}" class="full-image" />
+					<p>
+						<a href="#" class="subdued"><i class="ion-ios-trash-outline"></i> 删除</a>
+						<a href="#" class="subdued"><i class="ion-ios-upload-outline"></i> 重新上传</a></p>
+				</div>				
+			</ion-item>
+
+			<button class="button button-full button-stable" ng-click="actions.toSave()">
+        提交
+      </button>
+		</ion-list>
+	</ion-content>
+</ion-view>

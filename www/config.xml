@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <widget id="net.go5le.bangyou" version="1.0.0" xmlns="http://www.w3.org/ns/widgets" xmlns:gap="http://phonegap.com/ns/1.0" xmlns:cdv="http://cordova.apache.org/ns/1.0" xmlns:android="http://schemas.android.com/apk/res/android">
-  <name>友帮</name>
+  <name>中韩在线理赔</name>
   <description>
     youbang App.
   </description>
@@ -17,7 +17,7 @@
   <preference name="UIWebViewBounce" value="false"/>
   <preference name="DisallowOverscroll" value="true"/>
   <preference name="BackupWebStorage" value="none"/>
-  <preference name='phonegap-version' value='cli-5.2.0' /><!-- android有问题 -->
+  <preference name='phonegap-version' value='cli-6.1.0' /><!-- android有问题 -->
   <preference name="orientation" value="portrait"/>
   <preference name="target-device" value="universal"/>
   <preference name="fullscreen" value="false"/>

@@ -1,0 +1,41 @@
+<ion-view view-title="理赔预约">
+	<ion-content>
+
+		<ion-list>
+			
+
+			<ion-item class="item-input">
+        <span class="input-label">地址:</span>
+          <input type="text" placeholder="请输入地址" ng-model="lp.address" required="" name="address" >
+          <button-clear-input input="lp.address"></button-clear-input>
+        <!-- </div> -->
+      </ion-item>
+
+      <ion-item class="item-input">
+        <span class="input-label">联系人:</span>
+          <input type="text" placeholder="请输入联系人" ng-model="lp.linker" required="" name="linker" >
+          <button-clear-input input="lp.linker"></button-clear-input>
+        <!-- </div> -->
+      </ion-item>
+
+      <ion-item class="item-input">
+        <span class="input-label">联系电话:</span>
+          <input type="text" placeholder="请输入联系电话" ng-model="lp.tel" required="" name="tel" >
+          <button-clear-input input="lp.tel"></button-clear-input>
+        <!-- </div> -->
+      </ion-item>
+      
+      <div class="item">
+        <p>我们会在2-3个工作日内与您联系。</p>
+      </div>
+
+
+
+      <button class="button button-full button-stable" ng-click="toSubmit()">
+        提交
+      </button>
+
+
+		</ion-list>
+	</ion-content>
+</ion-view>

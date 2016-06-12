@@ -1,0 +1,33 @@
+<ion-view view-title="我的理赔">
+	<ion-content>
+    <ion-refresher pulling-text="释放刷新..." refreshing-text="正在刷新..." on-refresh="actions.doRefresh()"></ion-refresher>
+
+		<ion-list>
+      <div ng-repeat="basicInfo in basicInfos">  			
+        <ion-item class="item-divider item-icon-right" ui-sref="user.myclaimitem({lp: basicInfo.RgtNo})">
+          立案号:{{basicInfo.RgtNo}}
+          <i class="icon ion-ios-arrow-right"></i>
+        </ion-item>
+        <ion-item>
+          事故人
+          <span class="item-note">{{basicInfo.Name}}</span>       
+        </ion-item>
+        <ion-item>
+          申请自助理赔时间
+          <span class="item-note">{{basicInfo.accidentDate | date: 'yyyy年MM月dd日'}}</span>       
+        </ion-item>
+
+        <ion-item>
+          赔付金额
+          <span class="item-note">{{basicInfo.accidentAmount | number:2}}元</span>       
+        </ion-item>
+
+        <ion-item>
+          理赔状态
+          <span class="item-note">{{basicInfo.Status}}</span>       
+        </ion-item>
+
+      </div>
+		</ion-list>
+	</ion-content>
+</ion-view>

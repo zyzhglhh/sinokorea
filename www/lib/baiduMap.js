@@ -128,7 +128,7 @@
                     map.addOverlay(circle);
 
                     var local = new BMap.LocalSearch(map,{renderOptions:{map:map,autoViewport:false}});
-                    local.searchNearby(['九洲大药房'],point, 10000);
+                    local.searchNearby(['医院','药店'],point, 10000);
                 };
 
 
