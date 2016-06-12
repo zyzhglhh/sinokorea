@@ -52,8 +52,37 @@ angular.module('yiyangbao.controllers.user', [])
 }])
 
 
-.controller('userBespeakCtrl', ['$scope', function($scope){
-	
+.controller('userBespeakCtrl', ['$scope', '$state', 'PageFunc', function($scope, $state, PageFunc){
+	$scope.bespeak = {
+		linker: '吴永松',
+		tel: '15888800143',
+		address: '浙江省杭州市西湖区浙江大学玉泉'
+	};
+	$scope.actions = {
+		toSubmit: function() {
+			var msg = '';
+			if ( $scope.bespeak.linker == '') {
+				msg += '请填写联系人!' + '<br />';
+			}
+			if ( $scope.bespeak.tel == '') {
+				msg += '请填写联系人电话!' + '<br />';
+			}
+			if ( $scope.bespeak.address == '') {
+				msg += '请填写联系地址!' + '<br />';
+			}
+
+			if ( msg.length > 0 ) {
+				PageFunc.message(msg, 5000, '填写信息').then(function(res){
+
+				});
+			} else {
+				PageFunc.message('我们会在2-3个工作日内与您联系。', null, '预约成功').then(function(res) {
+					$state.go('user.claimschedule');
+				})
+				
+			}
+		}
+	}
 }])
 
 
@@ -130,40 +159,40 @@ angular.module('yiyangbao.controllers.user', [])
 	});
 }])
 
-.controller('userClaimingUploadCtrl', ['$scope', '$state', '$stateParams', '$filter', 'PageFunc', function($scope, $state, $stateParams, $filter, PageFunc) {
+.controller('userClaimingUploadCtrl', ['$scope', '$state', '$stateParams', '$filter', '$ionicActionSheet', 'PageFunc', function($scope, $state, $stateParams, $filter, $ionicActionSheet, PageFunc) {
 	$scope.lp = $stateParams.lp;
 	var uploadImgConfig = {
-		'1': {
+		'7601121': {
 			id: '7601121',
 			title: '理赔申请书',
 			isMore: true,
 			description: '请上传理赔申请书资料'
 		},
-		2: {
+		'7612161': {
 			id: '7612161',
 			title: '身份证（正反面）',
 			isMore: true,
 			description: '请上传身份证的（正反面）'
 		},
-		3: {
+		'7613161': {
 			id: '7613161',
 			title: '住院病历、出院小结',
 			isMore: true,
 			description: '住院病历、出院小结（包括门诊病历的首页个人信息）'
 		},
-		4: {
+		'7614161': {
 			id: '7614161',
 			title: '门诊病历',
 			isMore: true,
 			description: '门诊病历（包括病历首页的个人信息）'
 		},
-		5: {
+		'7615161': {
 			id: '7615161',
 			title: '医疗费数据原件',
 			isMore: true,
 			description: '医疗费数据原件即明细清单'
 		},
-		6: {
+		'7616161': {
 			id: '7616161',
 			title: '受益人银行卡或存折',
 			isMore: true,
@@ -199,22 +228,45 @@ angular.module('yiyangbao.controllers.user', [])
 		]
 	}
 
+	$scope.$on("$ionicView.beforeEnter", function(event, data){
+		$scope.uploadImages = angular.extend({}, uploadImgConfig);
+		if ($scope.lp.inHospital === true) {
+			delete $scope.uploadImages['7614161'];		
+		} else {
+			delete $scope.uploadImages['7613161'];
+		}		
+	});
+
 	$scope.actions = {
 		toSave: function() {
 			PageFunc.message('尊敬的客户，您好，根据您 '+ $filter('date')(new Date(), 'yyyy-MM-dd') +' 提交的姓名为'+ $scope.lp.truename +'的自助理赔申请，需要提供您本次申请的理赔申请书原件、医疗收据发票或清单原件（如果已在其他公司报销，则提供发票复印件和分割单原件），我司已开通上门收件服务，请点击“确定”接钮进行预约，预约成功后我们会及时与您联系。', null, '理赔预约').then(function(res) {		
 				$state.go('user.bespeak');
 			});
+		},
+		toUpload: function(id, pageNo) {
+
+			var hideSheet = $ionicActionSheet.show({
+				buttons: [
+					{text: '<b>拍摄照片</b>'},
+					{text: '相册照片'}
+				],
+				titleText: '上传' + $scope.uploadImages[id].title,
+				cancelText: '取消',
+				cancel: function() {
+
+				},
+				buttonClicked: function(index) {
+					console.log(index);
+				}
+			});
+		},
+		toDelete: function(id, pageNo) {
+			PageFunc.confirm('您确认要删除' + $scope.uploadImages[id].title + '的图片吗?','提示信息').then(function(res) {
+				console.log(res);
+			});
 		}
 	}
-
-	$scope.$on("$ionicView.beforeEnter", function(event, data){
-		$scope.uploadImages = angular.extend({}, uploadImgConfig);
-		if ($scope.lp.inHospital === true) {
-			delete $scope.uploadImages[4];		
-		} else {
-			delete $scope.uploadImages[3];
-		}		
-	});
+	
 
 }])
 
@@ -292,37 +344,37 @@ angular.module('yiyangbao.controllers.user', [])
 	
 
 	var uploadImgConfig = {
-		'1': {
+		'7601121': {
 			id: '7601121',
 			title: '理赔申请书',
 			isMore: true,
 			description: '请上传理赔申请书资料'
 		},
-		2: {
+		'7612161': {
 			id: '7612161',
 			title: '身份证（正反面）',
 			isMore: true,
 			description: '请上传身份证的（正反面）'
 		},
-		3: {
+		'7613161': {
 			id: '7613161',
 			title: '住院病历、出院小结',
 			isMore: true,
 			description: '住院病历、出院小结（包括门诊病历的首页个人信息）'
 		},
-		4: {
+		'7614161': {
 			id: '7614161',
 			title: '门诊病历',
 			isMore: true,
 			description: '门诊病历（包括病历首页的个人信息）'
 		},
-		5: {
+		'7615161': {
 			id: '7615161',
 			title: '医疗费数据原件',
 			isMore: true,
 			description: '医疗费数据原件即明细清单'
 		},
-		6: {
+		'7616161': {
 			id: '7616161',
 			title: '受益人银行卡或存折',
 			isMore: true,
