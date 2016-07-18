@@ -2,11 +2,6 @@
 	<ion-content>
 		<ion-list>
 			<ion-item>
-				被保险人
-				<span class="item-note">{{lp.relationType.value}}</span>
-			</ion-item>
-
-			<ion-item>
 				被保人姓名
 				<span class="item-note">{{lp.truename}}</span>
 			</ion-item>
@@ -31,29 +26,35 @@
 				<p><span class="item-note">{{lp.accidentSite}}</span></p>
 			</ion-item>
 
-			
-			
-		</ion-list>
+			<ion-list>
+			<ion-item class="item-divider">需要上传的理赔资料</ion-item>
+			<ion-item class="item-body item-icon-left" ng-repeat="uploadimg in uploadImages">
+				<i class="ion-ios-upload-outline"></i>
+				{{uploadimg.title}}		
+				<div class="row">
 
-		<ion-list>
-			<ion-item class="item-divider">上传资料</ion-item>
-			<ion-item class="item-body" ng-repeat="uploadimg in uploadImages">
-				<a ng-click="actions.toUpload(uploadimg.id)">
-				{{uploadimg.title}}
-					<span class="item-note"><i class="ion-ios-upload-outline"></i></span>
-				</a>
-				<p ng-if="!imagePages[uploadimg.id]">{{uploadimg.description}}</p>
-				<div ng-if="imagePages[uploadimg.id]" ng-repeat="imgpage in imagePages[uploadimg.id]">
-					<img ng-src="{{imgpage.ImageUrl}}" class="full-image" />
-					<p>
-						<a class="subdued" ng-click="actions.toDelete(uploadimg.id, imgpage.PageNo);"><i class="ion-ios-trash-outline"></i> 删除</a>
-						<a class="subdued" ng-click="actions.toUpload(uploadimg.id, imgpage.PageNo)"><i class="ion-ios-upload-outline"></i> 重新上传</a></p>
-				</div>				
-			</ion-item>
-
-			<button class="button button-full button-stable" ng-click="actions.toSave()">
-        提交
+					<div class="col col-20" ng-if="imagePages[uploadimg.id]" ng-repeat="imgpage in imagePages[uploadimg.id]">
+						<img ng-src="{{imgpage.ImageUrl}}" class="full-image height-60" ng-click="actions.toClickImage(uploadimg.id)" />
+					</div>
+				</div>	
+			</ion-item>			
+			<button class="button button-full button-stable" ng-click="actions.toUploadImages()">
+        上传资料
       </button>
+
+      
+
+      <button ng-disabled="!isSubmitEnabled" class="button button-full button-stable" ng-click="actions.toSubmit()" >提交</button>
+
+
+      <ion-item ng-if="error.claimPicsError"><!-- ng-if会创建子$scope, 因此需要采用数组方式传递变量(内存地址引用), 否则子$scope中对takePicsError的改变不会影响父$scope的takePicsError, 元素不会消失 -->
+          {{error.claimPicsError}} <i class="icon ion-ios-close" ng-click="error.claimPicsError = ''"></i>
+      </ion-item>
 		</ion-list>
+
+		
+
+		
+
 	</ion-content>
 </ion-view>

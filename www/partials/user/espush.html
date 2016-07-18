@@ -1,0 +1,15 @@
+<ion-view view-title="我的消息">
+	<ion-content>
+		<ion-refresher pulling-text="释放刷新..." refreshing-text="正在刷新..." on-refresh="actions.doRefresh()"></ion-refresher>
+		<ion-list>
+			<div ng-repeat="esi in espushs">
+				<ion-item class="item-divider"></ion-item>				
+				<ion-item class="item-body item-button-right">
+					{{esi.reason}}
+					<button ng-if="esi.type === 'espush'" ui-sref="user.espushitem({id:esi.id, issuepolNo:esi.issuepolNo})" ui-sref-opts="{inherit: true}" class="button button-clear button-light">重新上传</button>
+					<p>{{esi.content}}</p>
+				</ion-item>
+			</div>
+		</ion-list>
+	</ion-content>
+</ion-view>

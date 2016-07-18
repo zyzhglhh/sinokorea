@@ -5,7 +5,7 @@
 			
       <ion-item class="item-input item-select">
         <span class="input-label">被保险人:</span>
-        <select ng-options="relationType.value for relationType in config.relationTypes" ng-model="lp.relationType" ng-change="actions.chgRelationType()"></select>
+        <select ng-options="Relation.Name for Relation in config.RelationList" ng-model="lp.relation" ng-change="actions.chgRelation()"></select>
       </ion-item>
 
       <ion-item class="item-input" >
@@ -50,6 +50,32 @@
       <ion-item>
         <input type="checkbox" ng-model="lp.isReal">  
         我已确定出险信息属实     
+      </ion-item>
+
+      <ion-item class="item-divider">理赔预约</ion-item>
+      <ion-item class="item-input">
+        <span class="input-label">联系人:</span>
+          <input type="text" placeholder="请输入联系人" ng-model="lp.bespokeLinker" required="" name="linker" >
+          <button-clear-input input="bespeak.linker"></button-clear-input>
+        <!-- </div> -->
+      </ion-item>
+
+      <ion-item class="item-input">
+        <span class="input-label">联系电话:</span>
+          <input type="text" placeholder="请输入联系电话" ng-model="lp.bespokeTel" required="" name="tel" >
+          <button-clear-input input="bespeak.tel"></button-clear-input>
+        <!-- </div> -->
+      </ion-item>
+
+      <ion-item class="item-input  item-stacked-label">
+        <span class="input-label">联系地址:</span>
+          <input type="text" placeholder="请输入地址" ng-model="lp.bespokeAddress" required="" name="address" >
+        <!-- </div> -->
+      </ion-item>
+
+      <ion-item class="item-input item-select">
+        <span class="input-label">预约时间:</span>
+        <select ng-options="bespokeDate.value for bespokeDate in config.bespokeDates" ng-model="lp.bespokeDate"></select>
       </ion-item>
 
       <button class="button button-full button-stable" ng-click="actions.toContinue()">

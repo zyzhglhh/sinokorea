@@ -1,0 +1,60 @@
+<ion-view view-title="影像问题件重传">
+	<ion-content>
+		<ion-refresher pulling-text="释放刷新..." refreshing-text="正在刷新..." on-refresh="actions.doRefresh()"></ion-refresher>
+		<ion-list>
+			<ion-item>				
+				报案号：{{basicInfo.rgtNo}}
+			</ion-item>
+
+			<ion-item class="item-divider">事故人信息</ion-item>
+
+			<ion-item>
+				事故人
+				<span class="item-note">{{basicInfo.accidentInfo.name}}</ion-item>
+			</ion-item>
+			<ion-item>
+				{{basicInfo.accidentInfo.idType | idTypeText}}
+				<span class="item-note">{{basicInfo.accidentInfo.idNo}}</ion-item>
+			</ion-item>
+
+
+			<ion-item class="item-divider">自助申请理赔信息</ion-item>
+			
+			<ion-item>
+				是否住院
+				<span class="item-note">{{basicInfo.basicInfo.inHospital ? '是' : '否'}}</span>
+			</ion-item>
+			<ion-item>
+				出险日期
+				<span class="item-note">{{basicInfo.basicInfo.accidentDate | date: 'yyyy年MM月dd日'}}</span>
+			</ion-item>
+			<ion-item>
+				出险地点
+				<p><span class="item-note">{{basicInfo.basicInfo.accidentSite}}</span></p>
+			</ion-item>
+
+			<ion-item class="item-divider">需要重传资料</ion-item>
+			<ion-item class="item" ng-repeat="ei in esinfo.subList">
+				
+				{{uploadImgConfig[ei.subType].title}}{{ei.subType}}
+				<div class="row">
+
+					<div class="col col-20" ng-if="imagePages[ei.subType]" ng-repeat="imgpage in imagePages[ei.subType]">
+						<img ng-src="{{imgpage.ImageUrl}}" class="full-image height-60" ng-click="actions.toClickImage(ei.subType)" />
+					</div>
+				</div>	
+			</ion-item>
+			<ion-item class="item-body">
+				{{esinfo.reason}}
+				<p>{{esinfo.content}}</p>
+			</ion-item>
+			<button class="button button-full button-stable" ng-click="actions.toUploadImages()">
+        重新上传
+      </button>
+
+      <button ng-disabled="!isSubmitEnabled" class="button button-full button-stable" ng-click="actions.toSubmit()" >提交</button>
+
+		</ion-list>
+
+	</ion-content>
+</ion-view>

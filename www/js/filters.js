@@ -32,6 +32,51 @@ angular.module('yiyangbao.filters', [])
         }
     };
 })
+.filter('claimStateText', function() {
+    var hash = {
+        0: '提交中',
+        1: '审核中',
+        9: '完成'
+    };
+    return function(input) {
+        return hash[input] || ''
+    }
+})
+.filter('idTypeText', function() {
+    var hash = {
+        0: '身份证',
+        1: '护照',
+        2: '军人证(军官证)',
+        3: '驾照',
+        4: '户口本',
+        5: '学生证',
+        6: '工作证',
+        7: '出生证',
+        8: '其他',
+        9: '无证件',
+        A: '士兵证',
+        B: '回乡证',
+        C: '临时身份证',
+        D: '警官证',
+        E: '台胞证',
+        F: '港、澳、台通行证'
+    };
+    return function(input) {
+        return hash[input] || hash[8];
+    }
+})
+.filter('relationText', function() {
+    var hash = {
+        '00': '本人',
+        '01': '父母',
+        '02': '配偶',
+        '03': '子女',
+        '06': '其他'
+    };
+    return function(input) {
+        return hash[input] || hash['06'];
+    }
+})
 .filter('maskMobile', function () {
     return function (input) {
         if (!input) {

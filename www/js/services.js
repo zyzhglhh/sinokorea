@@ -6,6 +6,7 @@ angular.module('yiyangbao.services', ['ngResource'])
   // ioDefaultNamespace: 'localhost/default',
   consReceiptUploadPath: 'cons/receiptUpload',
   userResUploadPath: 'user/resUpload',
+  skApiResUploadPath: 'skApi/resourcesUpload',
   cameraOptions: { 
     quality: 20,
     destinationType: 1, 
@@ -71,7 +72,45 @@ angular.module('yiyangbao.services', ['ngResource'])
     '最喜欢的水果',
     '最喜欢的食物',
     '最喜欢的宠物'],
-  serv400: {number: '4008006666', caption: '4008-006-666'}
+  serv400: {number: '4008006666', caption: '4008-006-666'},
+  uploadImgConfig : {
+    '7601121': {
+      id: '7601121',
+      title: '理赔申请书',
+      isMore: true,
+      description: '请上传理赔申请书资料'
+    },
+    '7612161': {
+      id: '7612161',
+      title: '身份证（正反面）',
+      isMore: true,
+      description: '请上传身份证的（正反面）'
+    },
+    '7613161': {
+      id: '7613161',
+      title: '住院病历、出院小结',
+      isMore: true,
+      description: '住院病历、出院小结（包括门诊病历的首页个人信息）'
+    },
+    '7614161': {
+      id: '7614161',
+      title: '门诊病历',
+      isMore: true,
+      description: '门诊病历（包括病历首页的个人信息）'
+    },
+    '7615161': {
+      id: '7615161',
+      title: '医疗费数据原件',
+      isMore: true,
+      description: '医疗费数据原件即明细清单'
+    },
+    '7616161': {
+      id: '7616161',
+      title: '受益人银行卡或存折',
+      isMore: true,
+      description: '受益人银行卡或存折（受益人是指被保险人本人）'
+    }
+  }
 })
 
 .factory('Storage', ['$window', function ($window) {
@@ -156,8 +195,25 @@ angular.module('yiyangbao.services', ['ngResource'])
     });
   };
 
+  var Claim = function() {
+    return $resource(CONFIG.baseUrl + ':path/:route', {
+      path: 'skApi',
+    }, {
+      relation: {method: 'GET', params:{route: 'relation'}, timeout: 10000},
+      addClaim: {method: 'POST', params:{route: 'addClaim'}, timeout: 10000},
+      getClaimInfo: {method: 'GET', params:{route: 'getClaimInfo'}, timeout: 10000},
+      getClaims: {method: 'POST', params:{route: 'getClaims'}, timeout: 10000},
+      getMessageCount: {method: 'GET', params:{route: 'getMessageCount'}, timeout: 10000},
+      addClaimEspush: {method: 'POST', params:{route: 'addEspush'}, timeout: 10000},
+      getESPush: {method: 'POST', params:{route: 'getESPushs'}, timeout: 10000},
+      getClaimSchedule: {method: 'POST', params:{route: 'getClaimSchedule'}, timeout: 10000},
+    });
+  };
+
+
 
   self.User = User();
+  self.Claim = Claim();
 
   return self;
 }])
@@ -801,135 +857,7 @@ angular.module('yiyangbao.services', ['ngResource'])
       });
     };
   };
-  self.takePicsModal = function ($scope, images) {
-    $ionicModal.fromTemplateUrl('partials/modal/takePics.html', {
-      scope: $scope,
-      animation: 'slide-in-up'
-    }).then(function (modal) {
-      $scope.takePicsModal = modal;
-      $scope.takePicsModal.show();
-      $timeout(function () { 
-        $scope.slidesCount = $ionicSlideBoxDelegate.$getByHandle('takePics').slidesCount();
-        $ionicSlideBoxDelegate.$getByHandle('takePics').enableSlide(false); 
-        $ionicSlideBoxDelegate.$getByHandle('takePics').update();
-      }); 
-    });
-    $scope.actions = $scope.actions || {};
-    $scope.error = $scope.error || {};
-    $scope.config = $scope.config || {};
-    $scope.pageHandler = $scope.pageHandler || {progress: 0};
-    for (var i = 0; i < images.length; i++) { 
-      for (var j = 0; j < $scope.config.images.length; j++) { 
-        if ($scope.config.images[j].title === images[i].title) {
-          $scope.config.images[j].Url = images[i].Url;
-          $scope.config.images[j]._id = images[i]._id;
-        }
-      }
-    }
-    var cameraOptions = angular.copy(CONFIG.cameraOptions), 
-        uploadOptions = angular.copy(CONFIG.uploadOptions);
-    $scope.currentIndex = 0;
-    $scope.actions.closeTakePics = function () {
-      $scope.takePicsModal.hide();
-    };
-    $scope.actions.rmTakePics = function () {
-      $scope.takePicsModal.remove()
-      .then(function () {
-        $scope.takePicsModal = null;
-      });
-    };
-    $scope.actions.previous = function () {
-      $ionicSlideBoxDelegate.$getByHandle('takePics').previous();
-    };
-    $scope.actions.next = function () {
-      $ionicSlideBoxDelegate.$getByHandle('takePics').next();
-    };
-    $scope.actions.getIndex = function () {
-      $scope.currentIndex = $ionicSlideBoxDelegate.$getByHandle('takePics').currentIndex();
-      $scope.error.takePicsError = '';
-    };
-    $scope.actions.takePics = function (imgTitle, _id) {
-      if (!(window.navigator && window.navigator.camera)) {
-        return console.log('不支持window.navigator.camera');
-      }
-      $cordovaCamera.getPicture(cameraOptions).then(function (imageURI) {
-        $timeout(function () {
-          var serverUrl = encodeURI(CONFIG.baseUrl + CONFIG.userResUploadPath);
-          uploadOptions.headers = {Authorization: 'Bearer ' + Storage.get('token')};
-          uploadOptions.fileName = 'imgTitle' + CONFIG.uploadOptions.fileExt;
-          uploadOptions.params = {method: '$set', dest: 'personalInfo.idImg', queryTitle: imgTitle, _id: _id, replace: true, inArray: true}; 
-          PageFunc.confirm('是否上传?', '上传' + imgTitle).then(function (res) {
-            if (res) {
-              if (!window.FileTransfer) {
-                return console.log('不支持window.FileTransfer');
-              }
-              return $cordovaFileTransfer.upload(serverUrl, imageURI, uploadOptions, true).then(function (result) {
-                  $scope.pageHandler.progress = 0;
-                  $scope.error.takePicsError = '';
-                  var resImg = JSON.parse(result.response).results;
-                  if ($scope.accountInfo) {
-                    $scope.accountInfo.user.personalInfo.idImg = resImg;
-                    Storage.set('AccInfo', JSON.stringify($scope.accountInfo));
-                  }
-                  if ($scope.info) {
-                    $scope.info.personalInfo.idImg = resImg;
-                    Storage.set('info', JSON.stringify($scope.info));
-                  }
-                  for (var i = 0; i < resImg.length; i++) { 
-                    for (var j = 0; j < $scope.config.images.length; j++) {
-                      if ($scope.config.images[j].title === resImg[i].title) {
-                        $scope.config.images[j].Url = resImg[i].Url;
-                        $scope.config.images[j]._id = resImg[i]._id;
-                      }
-                    }
-                  }
-                  try {
-                    $cordovaCamera.cleanup().then(function () { 
-                      console.log("Camera cleanup success.");
-                    }, function (err) {
-                      console.log(err);
-                    });
-                  }
-                  catch (e) {
-                    console.log(e);
-                  }
-              }, function (err) {
-                $scope.error.takePicsError = err;
-                $scope.pageHandler.progress = 0;
-                try {
-                  $cordovaCamera.cleanup().then(function () { 
-                    console.log("Camera cleanup success.");
-                  }, function (err) {
-                    console.log(err);
-                  });
-                }
-                catch (e) {
-                  console.log(e);
-                }
-              }, function (progress) {
-                $scope.pageHandler.progress = progress.loaded / progress.total * 100;
-              });
-            }
-            $scope.pageHandler.progress = 0;
-            $scope.error.takePicsError = '取消上传!';
-            try {
-              $cordovaCamera.cleanup().then(function () { 
-                console.log("Camera cleanup success.");
-              }, function (err) {
-                console.log(err);
-              });
-            }
-            catch (e) {
-              console.log(e);
-            }
-          });
-        }, 0);
-      }, function (err) {
-        $scope.error.takePicsError = err;
-        console.log(err);
-      });
-    };
-  };
+
   self.initAccInfo = function ($scope) {
     $scope.error = {};
     var deferred = $q.defer();
@@ -958,6 +886,7 @@ angular.module('yiyangbao.services', ['ngResource'])
     var deferred = $q.defer();
     if (Storage.get('info')) { 
         $scope.info = JSON.parse(Storage.get('info'));
+
         $scope.info.idImgThumb = $scope.info.personalInfo.idImg.filter(function (img) {
             if (img) {
                 img.urlThumb = img.Url.replace(/\/([^\/]+?\.[^\/]+?)$/, '/thumb/$1'); 
@@ -968,6 +897,7 @@ angular.module('yiyangbao.services', ['ngResource'])
     }
     self.getInfo().then(function (data) {
         $scope.info = data.results; 
+
         $scope.info.idImgThumb = $scope.info.personalInfo.idImg.filter(function (img) {
             if (img) {
                 img.urlThumb = img.Url.replace(/\/([^\/]+?\.[^\/]+?)$/, '/thumb/$1'); 
@@ -991,10 +921,232 @@ angular.module('yiyangbao.services', ['ngResource'])
   return self;
 }])
 
+.factory('Claim', ['$q', '$ionicModal', '$ionicSlideBoxDelegate', '$ionicActionSheet', '$cordovaCamera', '$timeout', 'CONFIG', 'PageFunc', 'Data', function($q, $ionicModal, $ionicSlideBoxDelegate, $ionicActionSheet, $cordovaCamera, $timeout, CONFIG, PageFunc, Data) {
+  var self = this;
 
+  self.claimPicsModal = function($scope) {
+    $ionicModal.fromTemplateUrl('partials/modal/claim.html', {
+      scope: $scope,
+      animation: 'slide-in-up'
+    }).then(function(modal) {
+
+      $scope.claimPicsModal = modal;
+      $scope.claimPicsModal.show();
+      $timeout(function() {
+        $scope.slidesCount = $ionicSlideBoxDelegate.$getByHandle('claimPics').slidesCount();
+        $ionicSlideBoxDelegate.$getByHandle('claimPics').enableSlide(false); 
+        $ionicSlideBoxDelegate.$getByHandle('claimPics').update();
+      })
+    });
+
+    var cameraOptions = angular.copy(CONFIG.cameraOptions), 
+        uploadOptions = angular.copy(CONFIG.uploadOptions);
+
+    $scope.actions = $scope.actions || {};
+    $scope.imagePages = $scope.imagePages || {};
+    $scope.error = $scope.error || {};
+    $scope.currentIndex = 0;
+    $scope.actions.closeClaimPics = function() {
+      $scope.actions.checkSubmitEnabled();
+      $scope.claimPicsModal.hide();
+    }
+
+    $scope.actions.rmClaimPics = function() {
+      $scope.claimPicsModal.remove()
+        .then(function() {
+          $scope.actions.checkSubmitEnabled();
+          $scope.claimPicsModal = null;
+        })
+    };
+
+    
+    $scope.actions.previous = function () {
+      $ionicSlideBoxDelegate.$getByHandle('claimPics').previous();
+    };
+
+    $scope.actions.next = function () {
+      $ionicSlideBoxDelegate.$getByHandle('claimPics').next();
+    };
+
+
+    $scope.actions.getIndex = function() {
+      $scope.currentIndex = $ionicSlideBoxDelegate.$getByHandle('claimPics').currentIndex();
+      $scope.error.claimPicsError = '';
+    }
+
+
+
+    $scope.actions.toUpload = function(id, pageNo) {
+
+      var hideSheet = $ionicActionSheet.show({
+        buttons: [
+          {text: '<b>拍摄照片</b>'},
+          {text: '相册照片'}
+        ],
+        titleText: '上传' + $scope.uploadImages[id].title,
+        cancelText: '取消',
+        cancel: function() {
+
+        },
+        buttonClicked: function(index) {
+          switch(index) {
+            case 0:
+              cameraOptions.sourceType = 1;
+              break;
+            case 1:
+              cameraOptions.sourceType = 2;
+              break;
+          }
+
+          if (!(window.navigator && window.navigator.camera)) {
+            return console.log('不支持window.navigator.camera');
+          }
+
+          $cordovaCamera.getPicture(cameraOptions).then(function(imageURI) {
+            
+            $timeout(function() {
+              $scope.imagePages[id] = $scope.imagePages[id] || [];
+              $scope.imagePages[id][ $scope.imagePages[id].length ] = {
+                subType: id,
+                subTitle: $scope.uploadImages[id].title, 
+                ImageUrl: imageURI
+              };
+
+              try {
+                $cordovaCamera.cleanup().then(function() {
+                  console.log('Camera cleanup success.');                  
+                }, function(err) {
+                  console.log(err);
+                })
+              } catch(e) {
+                console.log(e);
+              }
+            }, 0);
+
+          }, function(err) {
+            $scope.error.claimPicsError = err;
+            console.log(err);
+          });
+
+        }
+      });
+    };
+
+    $scope.actions.toDelete = function(id, index) {
+      PageFunc.confirm('您确认要删除此图片吗?' + id + '-' + index,'确认信息').then(function(res) {
+        console.log('res', res);
+        if ( res === true) {
+          // delete $scope.imagePages[id][index];
+          // $scope.imagePages[id] = $scope.imagePages[id].slice(index, index);
+          $scope.imagePages[id].splice(index, 1);
+          if ($scope.imagePages[id].length === 0) {
+            delete $scope.imagePages[id];
+          }
+        }
+      });
+    }
+
+  };
+
+
+  self.getClaims = function(query) {
+    var deferred = $q.defer();
+    Data.Claim.getClaims(query, function(data, headers) {
+      deferred.resolve(data);
+    }, function(err) {
+      deferred.reject(err);
+    })
+    return deferred.promise;
+  };
+
+  self.getMessageCount = function() {
+    var deferred = $q.defer();
+    Data.Claim.getMessageCount({},function(data, headers) {
+      deferred.resolve(data);
+    }, function(err) {
+      deferred.reject(err);
+    });
+    return deferred.promise;
+  };
+
+  self.getClaimInfo = function(query) {
+    var deferred = $q.defer();
+    Data.Claim.getClaimInfo(query, function(data, headers) {
+      deferred.resolve(data);
+    }, function(err) {
+      deferred.reject(err);
+    })
+    return deferred.promise;
+  };
+  
+  self.getClaimSchedule = function(query) {
+    var deferred = $q.defer();
+    Data.Claim.getClaimSchedule(query, function(data, headers) {
+      deferred.resolve(data);
+    }, function(err) {
+      deferred.reject(err);
+    })
+    return deferred.promise;
+  };
+
+  self.getESPush = function() {
+    var deferred = $q.defer();
+    Data.Claim.getESPush(function(data, headers) {
+      deferred.resolve(data);
+    }, function(err) {
+      deferred.reject(err);
+    });
+    return deferred.promise;
+  };
+
+
+  self.getRelation = function() {
+    var deferred = $q.defer();
+    Data.Claim.relation(function(data, headers) {
+      deferred.resolve(data);
+    }, function(err) {
+      deferred.reject(err);
+    });
+    return deferred.promise;
+  }
+
+  self.addClaimEspush = function(params) {
+    var deferred = $q.defer();
+    Data.Claim.addClaimEspush(params, function(data, headers) {
+      deferred.resolve(data);
+    }, function(err) {
+      deferred.reject(err);
+    });
+    return deferred.promise;
+  }
+
+
+
+  self.addClaim = function(params) {
+    var deferred = $q.defer();
+    Data.Claim.addClaim(params, function(data, headers){
+      deferred.resolve(data);
+    }, function(err) {
+      deferred.reject(err);
+    });
+    return deferred.promise;
+  }
+
+  return self;
+}])
 
 .factory('PageFunc', ['$ionicPopup', '$ionicScrollDelegate', '$ionicSlideBoxDelegate', '$ionicModal', '$timeout', function ($ionicPopup, $ionicScrollDelegate, $ionicSlideBoxDelegate, $ionicModal, $timeout) {
   return {
+    progress: function(_title, $scope) {
+      var progressPopup = $ionicPopup.alert({
+        title: _title,
+        templateUrl: 'partials/modal/progress.html',
+        scope: $scope,
+        buttons:[]
+      });
+
+      return progressPopup;
+    },
     message: function (_msg, _time, _title) {
       var messagePopup = $ionicPopup.alert({
         title: _title || '消息', 
@@ -1108,6 +1260,66 @@ angular.module('yiyangbao.services', ['ngResource'])
       };
     }
   };
+}])
+
+
+.factory('Common', [function() {
+  var self = this;
+  var ZEROS = '0000000000000';
+
+  self.leftZeroPad =  function(val, ml) {      // 字符串左边补齐位数
+    if(typeof(val) != 'string') {
+      val = String(val);
+    }
+    return ZEROS.substring(0, ml - val.length) + val;
+  };
+  
+  self.dateRndNo = function(number) {
+    var d = new Date();
+    var yyyy = d.getFullYear();
+    var mm = self.leftZeroPad(d.getMonth(), 2);
+    var dd = self.leftZeroPad(d.getDate(), 2);
+
+    return yyyy + mm + dd + '' + self.getRandomSn(4);
+  }
+
+  self.getRandomSn = function(number) {
+    return self.leftZeroPad(Math.ceil( Math.random()  * Math.pow(10, number)), number);
+  };
+
+  
+  return self;
+}])
+
+.factory('DateTime', [function() {
+  var self = this;
+
+  self.getWorkDate = function(days) {
+    var dates = [];
+    var currentDate = new Date();
+    var gday;
+    for(var d = 0; d < 12; d++) {
+      
+      gday = currentDate.getDay();
+      
+      if ( gday == 6) {
+        currentDate.setTime(currentDate.getTime() + 1 *  24 * 60 * 60 * 1000);
+        continue;
+      } else if (gday == 0) {
+        currentDate.setTime(currentDate.getTime() + 1 *  24 * 60 * 60 * 1000);
+        continue;
+      }
+      dates.push(new Date(currentDate.getTime()));
+      if ( dates.length === days) {
+        break;
+      }
+      currentDate.setTime(currentDate.getTime() + 1 *  24 * 60 * 60 * 1000);
+    }
+
+    return dates;
+  }
+
+  return self;
 }])
 
 ;

@@ -33,15 +33,22 @@
 
 
   	<ion-list class="card">
-			<a class="item item-avatar item-icon-right" href="#/user/mine">
-				<img ng-src="{{accountInfo.user.head.Url || 'img/defaultAvatar.png'}}" class="round-avatar">
-				<h2>{{accountInfo.user.personalInfo.name}}, {{accountInfo.user.personalInfo.gender | mapTitle}}</h2>
-				<!-- <p><span ng-if="accountInfo.user.mobile">手机: {{accountInfo.user.mobile}}, </span></p> -->
-				
-		    <i class="icon ion-ios-arrow-right"></i>
-			</a>
+			
 
-			<ion-item class="item item-thumbnail-left item-icon-right" ui-sref="user.claiming">
+			<ion-item class="item item-icon-left" ui-sref="user.espush">
+				<i class="icon ion-ios-chatbubble-outline"></i>
+				<h2>我的消息</h2>
+				<span class="badge badge-assertive">{{newMessageCount}}</span>
+	    </ion-item>
+
+	    <ion-item class="item item-thumbnail-left item-icon-right" ui-sref="user.claimnotice">
+				<img ng-src="img/navicon/app06.png" class="">
+				<h2 class="padding-top">理赔须知</h2>
+				<p>申请自助理赔注意事项与资料等</p>
+		        <i class="icon ion-ios-arrow-right"></i>
+	    </ion-item>
+
+	    <ion-item class="item item-thumbnail-left item-icon-right" ui-sref="user.claiming">
 				<img ng-src="img/navicon/apply.png" class="">
 				<h2 class="padding-top">我要理赔</h2>
 				<p>拍摄上传报销凭据，发起理赔</p>
@@ -51,12 +58,6 @@
 				<img ng-src="img/navicon/app01.png" class="">
 				<h2 class="padding-top">理赔进度查询</h2>
 				<p>查询我申请的理赔进度</p>
-		        <i class="icon ion-ios-arrow-right"></i>
-	    </ion-item>
-	    <ion-item class="item item-thumbnail-left item-icon-right" ui-sref="user.myclaim">
-				<img ng-src="img/navicon/app05.png" class="">
-				<h2 class="padding-top">我的理赔</h2>
-				<p>我的理赔查询列表</p>
 		        <i class="icon ion-ios-arrow-right"></i>
 	    </ion-item>
 

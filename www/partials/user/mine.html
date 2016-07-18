@@ -4,26 +4,29 @@
 
 		<ion-list>
 			<ion-item class="item-thumbnail-right item-icon-right text-middle" ng-click="actions.chgHead()">
-		      <img ng-src="{{accountInfo.user.head.Url || 'img/defaultAvatar.png'}}" class="round-avatar">
+		      <img ng-src="{{info.head.Url || 'img/defaultAvatar.png'}}" class="round-avatar">
 		      <h2>头像</h2>
 		      <i class="icon ion-ios-arrow-right"></i>
 		    </ion-item>
-
+            <ion-item class="item-input">
+                <span class="input-label">姓名:</span>
+                <span>{{info.personalInfo.name}}</span>
+            </ion-item>
 		    <ion-item class="item-input">
                 <span class="input-label">用户名:</span>
-                <span>{{accountInfo.user.username}}</span>
+                <span>{{info.username}}</span>
             </ion-item>
             <ion-item class="item-input">
                 <span class="input-label">身份证:</span>
-                <span>{{accountInfo.user.idNo}}</span>
+                <span>{{info.idNo}}</span>
             </ion-item>
             <ion-item class="item-input">
                 <span class="input-label">手机:</span>
-                <span>{{accountInfo.user.mobile}}</span>
+                <span>{{info.mobile}}</span>
             </ion-item>
             <ion-item class="item-input item-icon-right" ng-click="actions.chgEmail()">
                 <span class="input-label">邮箱:</span>
-                <span>{{accountInfo.user.email}}</span>
+                <span>{{info.email}}</span>
                 <i class="icon ion-ios-arrow-right"></i>
             </ion-item>
 

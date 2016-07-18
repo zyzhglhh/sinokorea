@@ -165,6 +165,34 @@ app
                 }
             }
         })
+        .state('user.espush', {
+            url: '/espush',
+            data:{
+                menuToggle: true
+            },
+            views:{
+                'userHome':{
+                    templateUrl:'partials/user/espush.html',
+                    controller: 'espushCtrl'
+                }
+            }
+        })
+        .state('user.espushitem', {
+            url: '/espushitem',
+            data:{
+                menuToggle: true
+            },
+            views:{
+                'userHome':{
+                    templateUrl:'partials/user/espushitem.html',
+                    controller: 'espushItemCtrl'
+                }
+            },
+            params: {
+              id: null,
+              issuepolNo: null
+            }
+        })
         .state('user.claiming', {
             url: '/claiming',
             data:{
@@ -225,7 +253,7 @@ app
                     controller: 'userMyclaimItemCtrl'
                 }
             },
-            params: {lp:null}
+            params: {rgtNo: null}
         })
         .state('user.claimnotice', {
             url: '/claimnotice',
@@ -239,6 +267,63 @@ app
                 }
             }
         })
+        .state('user.claimdeclare', {
+            url: '/claimdeclare',
+            data:{
+                menuToggle: true
+            },
+            views:{
+                'userHome':{
+                    templateUrl:'partials/user/claimdeclare.html',
+                }
+            }
+        })
+        .state('user.claimscope', {
+            url: '/claimscope',
+            data:{
+                menuToggle: true
+            },
+            views:{
+                'userHome':{
+                    templateUrl:'partials/user/claimscope.html',
+                }
+            }
+        })
+        .state('user.claimdatum', {
+            url: '/claimdatum',
+            data:{
+                menuToggle: true
+            },
+            views:{
+                'userHome':{
+                    templateUrl:'partials/user/claimdatum.html',
+                }
+            }
+        })
+        .state('user.claimexplain', {
+            url: '/claimexplain',
+            data:{
+                menuToggle: true
+            },
+            views:{
+                'userHome':{
+                    templateUrl:'partials/user/claimexplain.html',
+                }
+            }
+        })
+
+        .state('user.claimfraud', {
+            url: '/claimfraud',
+            data:{
+                menuToggle: true
+            },
+            views:{
+                'userHome':{
+                    templateUrl:'partials/user/claimfraud.html',
+                }
+            }
+        })
+
         .state('user.settings', {
             url: '/settings',
             views: {
