@@ -306,7 +306,7 @@ angular.module('yiyangbao.controllers.user', [])
 			$scope.progress.isProgressEnabled = true;
 			$scope.progress.progressMax = $scope.progress.imageCount * 100;
 
-			serverUrl = encodeURI(CONFIG.baseUrl + CONFIG.userResUploadPath);
+			serverUrl = encodeURI(CONFIG.baseUrl + CONFIG.skApiResUploadPath);
 			var uploadOptions = angular.copy(CONFIG.uploadOptions);
 			uploadOptions.headers = {Authorization: 'Bearer ' + Storage.get('token')};
       uploadOptions.fileName = 'imgTitle' + CONFIG.uploadOptions.fileExt;
