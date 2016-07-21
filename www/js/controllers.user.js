@@ -12,6 +12,12 @@ angular.module('yiyangbao.controllers.user', [])
 
 .controller('userHome', ['$scope', '$q', '$timeout', 'PageFunc', 'Storage', 'User', 'Claim', '$ionicHistory', function($scope, $q, $timeout, PageFunc, Storage, User, Claim, $ionicHistory){
 
+	User.initInfo($scope).then(function(data) {
+		console.log(data);
+	}, function(err) {
+		console.log(err);
+	});
+
 	var initCount = function() {
 		Claim.getMessageCount().then(function(data) {
 			$scope.newMessageCount = data.count;
@@ -29,6 +35,7 @@ angular.module('yiyangbao.controllers.user', [])
 	};
 
 	$scope.$on('$ionicView.beforeEnter', function () {
+
 		initCount();
 	});
 
