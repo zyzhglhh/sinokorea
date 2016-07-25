@@ -253,7 +253,7 @@ app
                     controller: 'userMyclaimItemCtrl'
                 }
             },
-            params: {rgtNo: null}
+            params: {claimNo: null}
         })
         .state('user.claimnotice', {
             url: '/claimnotice',

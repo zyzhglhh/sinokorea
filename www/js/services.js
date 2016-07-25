@@ -204,6 +204,7 @@ angular.module('yiyangbao.services', ['ngResource'])
       getClaimInfo: {method: 'GET', params:{route: 'getClaimInfo'}, timeout: 10000},
       getClaims: {method: 'POST', params:{route: 'getClaims'}, timeout: 10000},
       getMessageCount: {method: 'GET', params:{route: 'getMessageCount'}, timeout: 10000},
+      selfAddClaiming: {method: 'POST', params:{route: 'selfAddClaiming'}, timeout: 10000},
       addClaimEspush: {method: 'POST', params:{route: 'addEspush'}, timeout: 10000},
       getESPush: {method: 'POST', params:{route: 'getESPushs'}, timeout: 10000},
       getClaimSchedule: {method: 'POST', params:{route: 'getClaimSchedule'}, timeout: 10000},
@@ -403,8 +404,8 @@ angular.module('yiyangbao.services', ['ngResource'])
       self.login($scope);
     };
     $scope.login = {
-      username: '1',
-      password: 'a',
+      username: '',
+      password: '',
       rememberme: true
     };
   };
@@ -1028,6 +1029,7 @@ angular.module('yiyangbao.services', ['ngResource'])
             console.log(err);
           });
 
+          return true;
         }
       });
     };
@@ -1072,6 +1074,16 @@ angular.module('yiyangbao.services', ['ngResource'])
   self.getClaimInfo = function(query) {
     var deferred = $q.defer();
     Data.Claim.getClaimInfo(query, function(data, headers) {
+      deferred.resolve(data);
+    }, function(err) {
+      deferred.reject(err);
+    })
+    return deferred.promise;
+  };
+  
+  self.selfAddClaiming = function(params) {
+    var deferred = $q.defer();
+    Data.Claim.selfAddClaiming(params, function(data, headers) {
       deferred.resolve(data);
     }, function(err) {
       deferred.reject(err);
@@ -1135,7 +1147,7 @@ angular.module('yiyangbao.services', ['ngResource'])
   return self;
 }])
 
-.factory('PageFunc', ['$ionicPopup', '$ionicScrollDelegate', '$ionicSlideBoxDelegate', '$ionicModal', '$timeout', function ($ionicPopup, $ionicScrollDelegate, $ionicSlideBoxDelegate, $ionicModal, $timeout) {
+.factory('PageFunc', ['$ionicPopup', '$ionicLoading', '$ionicScrollDelegate', '$ionicSlideBoxDelegate', '$ionicModal', '$timeout', function ($ionicPopup, $ionicLoading, $ionicScrollDelegate, $ionicSlideBoxDelegate, $ionicModal, $timeout) {
   return {
     progress: function(_title, $scope) {
       var progressPopup = $ionicPopup.alert({
@@ -1258,6 +1270,16 @@ angular.module('yiyangbao.services', ['ngResource'])
       $scope.actions.getIndex = function () {
         $scope.currentIndex = $ionicSlideBoxDelegate.$getByHandle('viewer').currentIndex();
       };
+    },
+    loading: {
+      show: function(){
+        $ionicLoading.show({
+          template: '<ion-spinner style="height:2em;width:2em"></ion-spinner>'
+        });
+      },
+      hide: function(){
+        $ionicLoading.hide();
+      }
     }
   };
 }])

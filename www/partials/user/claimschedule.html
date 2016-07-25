@@ -1,10 +1,18 @@
 <ion-view view-title="理赔进度查询">
+	<ion-nav-bar class="bar-royal">
+    <ion-nav-buttons side="left">
+			<a class="button button-icon icon ion-ios-arrow-back" href="#/user/home"></a>
+		</ion-nav-buttons>
+  </ion-nav-bar>
+
+
+
 	<ion-content>
 		<ion-refresher pulling-text="释放刷新..." refreshing-text="正在刷新..." on-refresh="actions.doRefresh()"></ion-refresher>
 		
 		<ion-list ng-repeat="basicInfo in basicInfos">
 			<ion-item class="item-divider"></ion-item>
-			<ion-item class="item-icon-right" ui-sref="user.myclaimitem({rgtNo: basicInfo.rgtNo})">
+			<ion-item class="item-icon-right" ui-sref="user.myclaimitem({claimNo: basicInfo.claimNo})">
 				报案号:{{basicInfo.rgtNo}}
 				<span class="item-note">{{basicInfo.Status}}</span>
 				<i class="icon ion-ios-arrow-right"></i>

@@ -1,8 +1,10 @@
 <ion-view view-title="我要理赔">
-	<ion-content>
+  <ion-content>
+    <ion-refresher pulling-text="释放刷新..." refreshing-text="正在刷新..." on-refresh="actions.doRefresh()"></ion-refresher>
 
-		<ion-list>
-			
+
+    <ion-list>
+      
       <ion-item class="item-input item-select">
         <span class="input-label">被保险人:</span>
         <select ng-options="Relation.Name for Relation in config.RelationList" ng-model="lp.relation" ng-change="actions.chgRelation()"></select>
@@ -82,6 +84,6 @@
         下一步
       </button>
 
-		</ion-list>
-	</ion-content>
+    </ion-list>
+  </ion-content>
 </ion-view>
