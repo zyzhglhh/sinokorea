@@ -12,8 +12,10 @@ angular.module('yiyangbao.services', ['ngResource'])
     destinationType: 1, 
     sourceType: 1, 
     encodingType: 0, 
+    targetHeight: 1600,
+    targetWidth: 1600,
     correctOrientation: true,
-    saveToPhotoAlbum: false,
+    saveToPhotoAlbum: true,
     cameraDirection: 0 
   },
   uploadOptions: {
@@ -1013,7 +1015,7 @@ angular.module('yiyangbao.services', ['ngResource'])
                 ImageUrl: imageURI
               };
 
-              try {
+              /*try {
                 $cordovaCamera.cleanup().then(function() {
                   console.log('Camera cleanup success.');                  
                 }, function(err) {
@@ -1021,7 +1023,7 @@ angular.module('yiyangbao.services', ['ngResource'])
                 })
               } catch(e) {
                 console.log(e);
-              }
+              }*/
             }, 0);
 
           }, function(err) {
