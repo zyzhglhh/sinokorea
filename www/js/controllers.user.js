@@ -18,6 +18,7 @@ angular.module('yiyangbao.controllers.user', [])
 		console.log(err);
 	});
 
+	$scope.newMessageCount = 0;
 	var initCount = function() {
 		Claim.getMessageCount().then(function(data) {
 			$scope.newMessageCount = data.count;
@@ -44,9 +45,9 @@ angular.module('yiyangbao.controllers.user', [])
 
 .controller('userBespeakCtrl', ['$scope', '$state', 'PageFunc', function($scope, $state, PageFunc){
 	$scope.bespeak = {
-		linker: '吴永松',
-		tel: '15888800143',
-		address: '浙江省杭州市西湖区浙江大学玉泉'
+		linker: '',
+		tel: '',
+		address: ''
 	};
 	$scope.actions = {
 		toSubmit: function() {

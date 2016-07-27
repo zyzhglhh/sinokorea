@@ -131,6 +131,16 @@ app
             templateUrl: 'partials/about/feedback.html',
             controller: 'feedback'
         });
+
+    $stateProvider.state('login', {
+        url: '/login',
+        templateUrl: 'partials/login.html',
+        controller: 'loginCtrl',
+        data: {
+            access: access.public
+        }
+    });
+
     $stateProvider
         .state('user', {
             abstract: true,
@@ -450,7 +460,8 @@ app
 
         switch (Token.curUserRole()) {
             case 'public':
-                $state.go('public.aboutUs');
+                // $state.go('public.aboutUs');
+                $state.go('login');
                 break;
             case 'user':
                 $state.go('user.home');
@@ -463,7 +474,8 @@ app
                 $state.go('medi.home');
                 break;
             default:
-                $state.go('public.aboutUs');
+                // $state.go('public.aboutUs');
+                $state.go('login');
         }
     });
 }])

@@ -3,18 +3,14 @@
 		<ion-refresher pulling-text="释放刷新..." refreshing-text="正在刷新..." on-refresh="actions.doRefresh()"></ion-refresher>
 
 		<ion-list>
-			<ion-item class="item-thumbnail-right item-icon-right text-middle" ng-click="actions.chgHead()">
-		      <img ng-src="{{info.head.Url || 'img/defaultAvatar.png'}}" class="round-avatar">
-		      <h2>头像</h2>
-		      <i class="icon ion-ios-arrow-right"></i>
-		    </ion-item>
+			
+            <ion-item class="item-input">
+                <span class="input-label">用户名:</span>
+                <span>{{info.username}}</span>
+            </ion-item>
             <ion-item class="item-input">
                 <span class="input-label">姓名:</span>
                 <span>{{info.personalInfo.name}}</span>
-            </ion-item>
-		    <ion-item class="item-input">
-                <span class="input-label">用户名:</span>
-                <span>{{info.username}}</span>
             </ion-item>
             <ion-item class="item-input">
                 <span class="input-label">身份证:</span>
@@ -24,10 +20,9 @@
                 <span class="input-label">手机:</span>
                 <span>{{info.mobile}}</span>
             </ion-item>
-            <ion-item class="item-input item-icon-right" ng-click="actions.chgEmail()">
+            <ion-item class="item-input">
                 <span class="input-label">邮箱:</span>
                 <span>{{info.email}}</span>
-                <i class="icon ion-ios-arrow-right"></i>
             </ion-item>
 
 		</ion-list>

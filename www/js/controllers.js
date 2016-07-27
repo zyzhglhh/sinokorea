@@ -26,7 +26,25 @@ angular.module('yiyangbao.controllers', [])
 }])
 
 .controller('aboutUs', ['$scope', function ($scope) {
-	
+    
+}])
+
+.controller('loginCtrl', ['$scope', 'User', function ($scope, User) {
+  $scope.state = {};
+	$scope.error = $scope.error || {};
+
+  $scope.login = {
+    username: '',
+    password: '',
+    rememberme: true
+  };
+
+  $scope.actions = {
+    login: function() {
+      User.login($scope);
+    }
+  }
+
 }])
 
 ;

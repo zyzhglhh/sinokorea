@@ -372,7 +372,8 @@ angular.module('yiyangbao.services', ['ngResource'])
           if (myAppVersionLocal) Storage.set('myAppVersion', myAppVersionLocal);
           $ionicHistory.clearHistory();
           $ionicHistory.clearCache();
-          $state.go('public.aboutUs');
+          // $state.go('public.aboutUs');
+          $state.go('login');
         }
       }
     });
@@ -986,7 +987,7 @@ angular.module('yiyangbao.services', ['ngResource'])
           {text: '<b>拍摄照片</b>'},
           {text: '相册照片'}
         ],
-        titleText: '上传' + $scope.uploadImages[id].title,
+        titleText: '拍照' + $scope.uploadImages[id].title,
         cancelText: '取消',
         cancel: function() {
 
