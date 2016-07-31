@@ -498,8 +498,17 @@ angular.module('yiyangbao.controllers.user', [])
 
 }])
 
-.controller('espushItemCtrl', ['$scope', '$state', '$stateParams', 'PageFunc', 'CONFIG', 'Claim', function($scope, $state, $stateParams, PageFunc, CONFIG, Claim) {
+.controller('espushItemCtrl', ['$scope', '$state', '$stateParams', '$filter', '$ionicActionSheet', '$cordovaFileTransfer', '$interval', 'Storage', 'PageFunc', 'CONFIG', 'Claim', function($scope, $state, $stateParams, $filter, $ionicActionSheet, $cordovaFileTransfer, $interval, Storage, PageFunc, CONFIG, Claim) {
 	
+	// $scope.stopinterval = null;
+	$scope.progress = {
+		isProgressEnabled : false,
+		progressval: 0,
+		imageCount: 0,
+		progressMax: 0,
+		progressUnitVal: 1
+	}
+
 	//$scope.esinfo = {};
 	$scope.uploadImages = {};
 

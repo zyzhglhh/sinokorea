@@ -35,7 +35,7 @@
   	<ion-list class="card">
 			
 
-			<ion-item class="item item-icon-left" ui-sref="user.espush">
+			<ion-item class="item item-icon-left" ui-sref="user.espush" ui-sref-opts="{reload:true}>
 				<i class="icon ion-ios-chatbubble-outline"></i>
 				<h2>我的消息</h2>
 				<span class="badge badge-assertive" ng-if="newMessageCount">{{newMessageCount}}</span>
