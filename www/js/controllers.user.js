@@ -13,7 +13,7 @@ angular.module('yiyangbao.controllers.user', [])
 .controller('userHome', ['$scope', '$q', '$timeout', 'PageFunc', 'Storage', 'User', 'Claim', '$ionicHistory', function($scope, $q, $timeout, PageFunc, Storage, User, Claim, $ionicHistory){
 
 	User.initInfo($scope).then(function(data) {
-		console.log(data);
+		// console.log(data);
 	}, function(err) {
 		console.log(err);
 	});
@@ -143,7 +143,13 @@ angular.module('yiyangbao.controllers.user', [])
 			}
 
 			if ( typeof $scope.lp.accidentDate === 'undefined' || $scope.lp.accidentDate == '') {
+
 				msg += '<br />请选择出险日期';
+			} else {
+
+				if ($scope.lp.accidentDate > new Date()) {
+					msg += '<br />出险日期不能大于当前日期';
+				}
 			}
 
 			if ( typeof $scope.lp.accidentSite === 'undefined' || $scope.lp.accidentSite == '') {
@@ -207,12 +213,32 @@ angular.module('yiyangbao.controllers.user', [])
 	});
 }])
 
-.controller('userClaimingUploadCtrl', ['$scope', '$state', '$stateParams', '$filter', '$ionicActionSheet', '$cordovaFileTransfer', '$interval', 'Storage', 'PageFunc', 'CONFIG', 'Common', 'Claim', function($scope, $state, $stateParams, $filter, $ionicActionSheet, $cordovaFileTransfer, $interval, Storage, PageFunc, CONFIG, Common, Claim) {
+.controller('userClaimingUploadCtrl', ['$scope', '$state', '$stateParams', '$filter', '$ionicActionSheet', '$cordovaFileTransfer', '$interval', '$location', 'Data', 'Storage', 'PageFunc', 'CONFIG', 'Common', 'Claim', function($scope, $state, $stateParams, $filter, $ionicActionSheet, $cordovaFileTransfer, $interval, $location, Data, Storage, PageFunc, CONFIG, Common, Claim) {
 	
 	$scope.$on("$ionicView.beforeEnter", function(event, data){
 		$scope.lp = $stateParams.lp;
 		claimNo = Common.dateRndNo(4);
 	});
+
+	if (PageFunc.isWeixin()) {
+        // console.log($location.$$absUrl);
+        Data.Interface.jsSdkConfig({url: $location.$$absUrl.split('#')[0]}, function (data, headers) {
+            // console.log(data.input);
+            var conf = data.results;
+            // conf.debug = true;
+            conf.jsApiList = ['chooseImage', 'uploadImage'];
+            // console.log(conf);
+            wx.config(conf);
+            wx.ready(function () {
+                console.log('wx.config OK!');
+            });
+            wx.error(function(res){
+                console.log(res);
+            });
+        }, function (err) {
+            console.log(err);
+        });
+    }
 
 
 	var uploadImgConfig = CONFIG.uploadImgConfig;
@@ -246,7 +272,6 @@ angular.module('yiyangbao.controllers.user', [])
 				$state.go('user.bespeak');
 			});*/
 			$scope.imgUploadings = Object.keys($scope.uploadImages).filter(function(item){				
-
 				return (typeof $scope.imagePages[item] !=='undefined' && $scope.imagePages[item].length > 0) ? false : true;
 			});
 			if ( $scope.imgUploadings.length===0) {
@@ -284,15 +309,24 @@ angular.module('yiyangbao.controllers.user', [])
 			
 			// $scope.actions.addClaim();
 
-			if (!window.FileTransfer) {
-				return console.log('不支持window.FileTransfer');
-			}
+			// if (!window.FileTransfer) {
+			// 	return console.log('不支持window.FileTransfer');
+			// }
 			$scope.progress.imageCount = 0;
 			$scope.progress.progressUnitVal = 1;
 			$scope.progress.progressMax = 0;
 			$scope.isSubmitEnabled = false;
+
+			var tmpUpArray = [];
 			for(var pid in $scope.imagePages) {
 				$scope.progress.imageCount += $scope.imagePages[pid].length;
+
+				for(var tti = 0; tti < $scope.imagePages[pid].length; tti++) {
+					tmpUpArray.push({
+						subType: $scope.imagePages[pid][tti].subType,
+						index: tti
+					});
+				}
 			}
 
 			$scope.progress.isProgressEnabled = true;
@@ -301,59 +335,89 @@ angular.module('yiyangbao.controllers.user', [])
 			serverUrl = encodeURI(CONFIG.baseUrl + CONFIG.skApiResUploadPath);
 			var uploadOptions = angular.copy(CONFIG.uploadOptions);
 			uploadOptions.headers = {Authorization: 'Bearer ' + Storage.get('token')};
-      uploadOptions.fileName = 'imgTitle' + CONFIG.uploadOptions.fileExt;
-      uploadOptions.params = {claimNo: claimNo}; 
+      		uploadOptions.fileName = 'imgTitle' + CONFIG.uploadOptions.fileExt;
+      		uploadOptions.params = {claimNo: claimNo}; 
 
-      //在上传图片之前先将理赔的资料添加我们自己的服务器记录中
-      Claim.selfAddClaiming({claimData:$scope.lp,claimNo: claimNo}).then(function(data) {
+      		//在上传图片之前先将理赔的资料添加我们自己的服务器记录中
+      		Claim.selfAddClaiming({claimData:$scope.lp,claimNo: claimNo}).then(function(data) {
 
-      	var progressPopup = PageFunc.progress('上传资料', $scope);	      
+      			var progressPopup = PageFunc.progress('上传资料', $scope);	 
 
-				for(var pitem in $scope.imagePages) {
-					$scope.imagePages[pitem].forEach(function(item) {
-						
-						uploadOptions.params['subType'] = item.subType;
-						uploadOptions.params['subTitle'] = item.subTitle;
-						
-						$cordovaFileTransfer.upload(serverUrl, item.ImageUrl, uploadOptions, true)
-							.then(function(result) {
-								$scope.progress.progressval = 0;
-								$scope.progress.progressMax = 0;
-								if ( $scope.progress.progressUnitVal >= $scope.progress.imageCount) {									
-									// $scope.progress.isProgressEnabled = false;
-									
-									//等图片都已经上传到我们自己的服务器上之后，再调用addClaim()方法提交到中韩接口同时把附件传到对方的FTP服务器上
+      			var loopUploadImage = function(item) {
+	      			uploadOptions.params['subType'] = item.subType;
+					uploadOptions.params['subTitle'] = item.subTitle;
 
-									Claim.addClaim({claimNo: claimNo}).finally(function() {
-										$scope.imagePages = {};
-										$scope.lp = {};
-										progressPopup.close();
-										$state.go('user.claimschedule', {}, {reload: true});
-									});									
+					if (PageFunc.isWeixin()) {
+						wx.uploadImage({
+	                        localId: item.ImageUrl, // 需要上传的图片的本地ID，由chooseImage接口获得
+	                        isShowProgressTips: 1, // 默认为1，显示进度提示
+	                        success: function (res) {
+	                        	uploadOptions.img = res.serverId;
+	                            Data.Interface.jsSdkReqMedia(uploadOptions, function (data, headers) {
+	                                $scope.progress.progressval = 0;
+									$scope.progress.progressMax = 0;
+									if ( $scope.progress.progressUnitVal >= $scope.progress.imageCount) {									
+										// $scope.progress.isProgressEnabled = false;
+										
+										//等图片都已经上传到我们自己的服务器上之后，再调用addClaim()方法提交到中韩接口同时把附件传到对方的FTP服务器上
 
-								} else {
-									$scope.progress.progressUnitVal++;
-								}							
+										Claim.addClaim({claimNo: claimNo}).finally(function() {
+											$scope.imagePages = {};
+											$scope.lp = {};
+											progressPopup.close();
+											$state.go('user.claimschedule', {}, {reload: true});
+										});									
 
-							}, function(err) {
-								$scope.error.claimPicsError = err;
+									} else {
+
+										loopUploadImage($scope.imagePages[tmpUpArray[$scope.progress.progressUnitVal].subType ][tmpUpArray[$scope.progress.progressUnitVal].index ]);  
+										
+										$scope.progress.progressUnitVal++;
+									}
+	                            }, function (err) {
+	                                console.log(err);
+	                            });
+	                            // uploaded.push(res.serverId); // 返回图片的服务器端ID
+	                            // uploading[i].resolve();
+	                        }
+	                    });
+					}
+					else {
+						$cordovaFileTransfer.upload(serverUrl, item.ImageUrl, uploadOptions, true).then(function(result) {
+							$scope.progress.progressval = 0;
+							$scope.progress.progressMax = 0;
+							if ( $scope.progress.progressUnitVal >= $scope.progress.imageCount) {									
 								// $scope.progress.isProgressEnabled = false;
-							}, function(progressobj) {
-								$scope.progress.progressMax = progressobj.total;
-								$scope.progress.progressval = $scope.progress.progressval + progressobj.loaded;
+								
+								//等图片都已经上传到我们自己的服务器上之后，再调用addClaim()方法提交到中韩接口同时把附件传到对方的FTP服务器上
 
-							});
+								Claim.addClaim({claimNo: claimNo}).finally(function() {
+									$scope.imagePages = {};
+									$scope.lp = {};
+									progressPopup.close();
+									$state.go('user.claimschedule', {}, {reload: true});
+								});									
 
-					});				
-				}
+							} else {
 
-      }, function(err) {
-      	console.log(err);
-      });
-      
-			
+								loopUploadImage($scope.imagePages[tmpUpArray[$scope.progress.progressUnitVal].subType ][tmpUpArray[$scope.progress.progressUnitVal].index ]);  
+								
+								$scope.progress.progressUnitVal++;
+							}							
+						}, function(err) {
+							$scope.error.claimPicsError = err;
+							// $scope.progress.isProgressEnabled = false;
+						}, function(progressobj) {
+							$scope.progress.progressMax = progressobj.total;
+							$scope.progress.progressval = $scope.progress.progressval + progressobj.loaded;
+						});
+					}
+      			} 
+      			loopUploadImage($scope.imagePages[tmpUpArray[0].subType ][tmpUpArray[0].index ]);
+      		}, function(err) {
+      			console.log(err);
+      		});
 		}
-
 	}
 
 	/*function startprogress() {	
@@ -477,14 +541,16 @@ angular.module('yiyangbao.controllers.user', [])
 	
 }])
 
-.controller('espushCtrl', ['$scope', 'Claim', function($scope, Claim) {
+.controller('espushCtrl', ['$scope', 'Claim', 'PageFunc', function($scope, Claim, PageFunc) {
 
 	var initEspushs = function() {
 		Claim.getESPush().then(function(data) {
 			$scope.espushs = data.results;
 		}, function(err) {
 			console.log(err);
-		});
+		}).finally(function() {
+			PageFunc.loading.hide();
+		});;
 	}
 
 	$scope.actions = {
@@ -494,12 +560,36 @@ angular.module('yiyangbao.controllers.user', [])
 		}
 	};
 
-	initEspushs();
+
+	$scope.$on("$ionicView.afterEnter", function(event, data){
+		PageFunc.loading.show();
+		initEspushs();
+	});	
 
 }])
 
-.controller('espushItemCtrl', ['$scope', '$state', '$stateParams', '$filter', '$ionicActionSheet', '$cordovaFileTransfer', '$interval', 'Storage', 'PageFunc', 'CONFIG', 'Claim', function($scope, $state, $stateParams, $filter, $ionicActionSheet, $cordovaFileTransfer, $interval, Storage, PageFunc, CONFIG, Claim) {
+.controller('espushItemCtrl', ['$scope', '$state', '$stateParams', '$filter', '$ionicActionSheet', '$cordovaFileTransfer', '$interval', '$location', 'Data', 'Storage', 'PageFunc', 'CONFIG', 'Claim', function($scope, $state, $stateParams, $filter, $ionicActionSheet, $cordovaFileTransfer, $interval, $location, Data, Storage, PageFunc, CONFIG, Claim) {
 	
+	if (PageFunc.isWeixin()) {
+        // console.log($location.$$absUrl);
+        Data.Interface.jsSdkConfig({url: $location.$$absUrl.split('#')[0]}, function (data, headers) {
+            // console.log(data.input);
+            var conf = data.results;
+            // conf.debug = true;
+            conf.jsApiList = ['chooseImage', 'uploadImage'];
+            // console.log(conf);
+            wx.config(conf);
+            wx.ready(function () {
+                console.log('wx.config OK!');
+            });
+            wx.error(function(res){
+                console.log(res);
+            });
+        }, function (err) {
+            console.log(err);
+        });
+    }
+
 	// $scope.stopinterval = null;
 	$scope.progress = {
 		isProgressEnabled : false,
@@ -569,16 +659,26 @@ angular.module('yiyangbao.controllers.user', [])
 		toSubmit: function() {
 			// $scope.actions.addClaimEspush();
 
-			if (!window.FileTransfer) {
-				return console.log('不支持window.FileTransfer');
-			}
+			// if (!window.FileTransfer) {
+			// 	return console.log('不支持window.FileTransfer');
+			// }
 
 			$scope.progress.imageCount = 0;
 			$scope.progress.progressUnitVal = 1;
 			$scope.progress.progressMax = 0;
 			$scope.isSubmitEnabled = false;
+
+			var tmpUpArray = [];
 			for(var pid in $scope.imagePages) {
 				$scope.progress.imageCount += $scope.imagePages[pid].length;
+
+				for(var tti = 0; tti < $scope.imagePages[pid].length; tti++) {
+					tmpUpArray.push({
+						subType: $scope.imagePages[pid][tti].subType,
+						index: tti
+					});
+				}
+
 			}
 
 			$scope.progress.isProgressEnabled = true;
@@ -586,50 +686,94 @@ angular.module('yiyangbao.controllers.user', [])
 			serverUrl = encodeURI(CONFIG.baseUrl + CONFIG.skApiResUploadPath);
 			var uploadOptions = angular.copy(CONFIG.uploadOptions);
 			uploadOptions.headers = {Authorization: 'Bearer ' + Storage.get('token')};
-      uploadOptions.fileName = 'imgTitle' + CONFIG.uploadOptions.fileExt;
-      uploadOptions.params = {rgtNo: $scope.basicInfo.rgtNo, issuepolNo: $scope.esinfo.issuepolNo}; 
+			uploadOptions.fileName = 'imgTitle' + CONFIG.uploadOptions.fileExt;
+			uploadOptions.params = {rgtNo: $scope.basicInfo.rgtNo, issuepolNo: $scope.esinfo.issuepolNo}; 
 
-      var progressPopup = PageFunc.progress('上传资料', $scope);	
+			var progressPopup = PageFunc.progress('上传资料', $scope);	
       
-			for(var pitem in $scope.imagePages) {
-				$scope.imagePages[pitem].forEach(function(item) {
+			var loopUploadImage = function(item)  {
 					uploadOptions.params['subType'] = item.subType;
-					$cordovaFileTransfer.upload(serverUrl, item.ImageUrl, uploadOptions, true)
-						.then(function(result) {
-							$scope.progress.progressval = 0;
-							$scope.progress.progressMax = 0;
-							if ( $scope.progress.progressUnitVal >= $scope.progress.imageCount) {	
 
-								Claim.addClaimEspush({
-									rgtNo: $scope.basicInfo.rgtNo,
-									issuepolNo: $scope.esinfo.issuepolNo
-								}).then(function(data) {
-									$scope.imagePages = {};
-									progressPopup.close();
-									$state.go('user.claimschedule', {}, {reload: true});
-								}, function(err) {				
-									PageFunc.message(err.data, 5000, '提示信息').then(function(res) {					
-									})
-								});
-								
-							} else {
-								$scope.progress.progressUnitVal++;
-							}
-						}, function(err) {
-							$scope.error.claimPicsError = err;
-						}, function(progressobj) {
-							$scope.progress.progressMax = progressobj.total;
-							$scope.progress.progressval = $scope.progress.progressval + progressobj.loaded;
-						});
+					if (PageFunc.isWeixin()) {
+						wx.uploadImage({
+	                        localId: item.ImageUrl, // 需要上传的图片的本地ID，由chooseImage接口获得
+	                        isShowProgressTips: 1, // 默认为1，显示进度提示
+	                        success: function (res) {
+	                        	uploadOptions.img = res.serverId;
+	                            Data.Interface.jsSdkReqMedia(uploadOptions, function (data, headers) {
+	                                $scope.progress.progressval = 0;
+									$scope.progress.progressMax = 0;
+									if ( $scope.progress.progressUnitVal >= $scope.progress.imageCount) {									
+										// $scope.progress.isProgressEnabled = false;
+										
+										//等图片都已经上传到我们自己的服务器上之后，再调用addClaim()方法提交到中韩接口同时把附件传到对方的FTP服务器上
 
-				});				
-			}
+										Claim.addClaimEspush({
+											rgtNo: $scope.basicInfo.rgtNo,
+											issuepolNo: $scope.esinfo.issuepolNo
+										}).then(function(data) {
+											$scope.imagePages = {};
+											progressPopup.close();
+											$state.go('user.claimschedule', {}, {reload: true});
+										}, function(err) {				
+											PageFunc.message(err.data, 5000, '提示信息').then(function(res) {					
+											})
+										});								
+
+									} else {
+
+										loopUploadImage($scope.imagePages[tmpUpArray[$scope.progress.progressUnitVal].subType ][tmpUpArray[$scope.progress.progressUnitVal].index ]);  
+										
+										$scope.progress.progressUnitVal++;
+									}
+	                            }, function (err) {
+	                                console.log(err);
+	                            });
+	                            // uploaded.push(res.serverId); // 返回图片的服务器端ID
+	                            // uploading[i].resolve();
+	                        }
+	                    });
+					}
+					else {
+						$cordovaFileTransfer.upload(serverUrl, item.ImageUrl, uploadOptions, true)
+							.then(function(result) {
+								$scope.progress.progressval = 0;
+								$scope.progress.progressMax = 0;
+								if ( $scope.progress.progressUnitVal >= $scope.progress.imageCount) {	
+
+									Claim.addClaimEspush({
+										rgtNo: $scope.basicInfo.rgtNo,
+										issuepolNo: $scope.esinfo.issuepolNo
+									}).then(function(data) {
+										$scope.imagePages = {};
+										progressPopup.close();
+										$state.go('user.claimschedule', {}, {reload: true});
+									}, function(err) {				
+										PageFunc.message(err.data, 5000, '提示信息').then(function(res) {					
+										})
+									});
+									
+								} else {
+									loopUploadImage($scope.imagePages[tmpUpArray[$scope.progress.progressUnitVal].subType ][tmpUpArray[$scope.progress.progressUnitVal].index ]);  
+
+									$scope.progress.progressUnitVal++;
+								}
+							}, function(err) {
+								$scope.error.claimPicsError = err;
+							}, function(progressobj) {
+								$scope.progress.progressMax = progressobj.total;
+								$scope.progress.progressval = $scope.progress.progressval + progressobj.loaded;
+							});
+					}
+
+				};
+
+				loopUploadImage($scope.imagePages[tmpUpArray[0].subType ][tmpUpArray[0].index ]);
 			
 			
 		}
 	};
 
-	
 
 	initClaimInfo();
 }])

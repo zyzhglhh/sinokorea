@@ -7,16 +7,16 @@
 
     <div class="buttons">
 
-    	<button class="button button-icon ion-android-arrow-back" ng-click="actions.previous()" ng-if="currentIndex"></button>
-    	<button class="button button-icon ion-android-arrow-forward" ng-click="actions.next()" ng-if="slidesCount - currentIndex - 1"></button>
+    	<button class="button button-icon ion-android-arrow-back" ng-click="actions.previous()" ng-if="currentIndex && (imgUploadings.length > 1)"></button>
+    	<button class="button button-icon ion-android-arrow-forward" ng-click="actions.next()" ng-if="(slidesCount - currentIndex - 1) && (imgUploadings.length > 1)"></button>
     	<button class="button button-clear" ng-click="actions.rmClaimPics()" ng-if="!(slidesCount - currentIndex - 1)"><span class="primary">完成</span></button>
     </div>
   </ion-header-bar>
-  <ion-content class="fullheight has-footer">
+  <ion-content>
 
-		<ion-slide-box delegate-handle="claimPics" show-pager="false" does-continue="false" class="fullheight" on-slide-changed="actions.getIndex()">
+		<ion-slide-box delegate-handle="claimPics" show-pager="false" does-continue="false" class="view-height" on-slide-changed="actions.getIndex()">
 			<ion-slide ng-repeat="uploadimg in imgUploadings">
-				<ion-content scroll="true">
+				<ion-content scroll="true" class="has-footer">
 					<ion-list>
 						<ion-item class="row">
 							<div class="col">
@@ -51,17 +51,8 @@
     width: 100%;
     height: 100%;
   }*/
-  /*要把所有的div都设置成100%高度, 本质是要把所有的父元素都设置成100%高度, 不然光设置某一个div, 会受父元素的影响, 不能占满屏幕高度*/
-  .fullheight div.scroll {
-    height: 100%;
-  }
-  /*这里不能对所有的div都设置高度，会影响到后面所有的页面，需单独设置一个元素fullheight*/
-  /*ion-slide-box必须设置高度，否则会影响到其内部的元素，造成ion-header-bar和ion-content都不显示*/
-  /*div:not(.nofullheight) {*/
-  .fullheight {
-    height: 100%;
-    /*height: auto;*/
-    /*height: 720px;*/  /*设置100%在窗口变小时高度会变为0*/
+  .view-height {
+    height: 100vh;
   }
   /*.blue {
     background-color: #BFFDF5;

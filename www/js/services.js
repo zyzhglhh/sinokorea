@@ -213,10 +213,20 @@ angular.module('yiyangbao.services', ['ngResource'])
     });
   };
 
+  var Interface = function () {
+    return $resource(CONFIG.baseUrl + ':path/:route', {
+      // path:'interface'
+    }, {
+      jsSdkConfig: {method:'GET', params:{path: 'wx', route:'jsSdkConfig'}, timeout: 30000},
+      jsSdkReqMedia: {method:'POST', params:{path: 'wx', route:'jsSdkReqMedia'}, timeout: 30000}
+    });
+  };
+
 
 
   self.User = User();
   self.Claim = Claim();
+  self.Interface = Interface();
 
   return self;
 }])
@@ -944,7 +954,8 @@ angular.module('yiyangbao.services', ['ngResource'])
     });
 
     var cameraOptions = angular.copy(CONFIG.cameraOptions), 
-        uploadOptions = angular.copy(CONFIG.uploadOptions);
+        uploadOptions = angular.copy(CONFIG.uploadOptions),
+        wxCameraOptions = ['camera'];
 
     $scope.actions = $scope.actions || {};
     $scope.imagePages = $scope.imagePages || {};
@@ -952,7 +963,8 @@ angular.module('yiyangbao.services', ['ngResource'])
     $scope.currentIndex = 0;
     $scope.actions.closeClaimPics = function() {
       $scope.actions.checkSubmitEnabled();
-      $scope.claimPicsModal.hide();
+      // $scope.claimPicsModal.hide();
+      $scope.actions.rmClaimPics();
     }
 
     $scope.actions.rmClaimPics = function() {
@@ -996,14 +1008,43 @@ angular.module('yiyangbao.services', ['ngResource'])
           switch(index) {
             case 0:
               cameraOptions.sourceType = 1;
+              wxCameraOptions = ['camera'];
               break;
             case 1:
               cameraOptions.sourceType = 2;
+              wxCameraOptions = ['album'];
               break;
           }
 
           if (!(window.navigator && window.navigator.camera)) {
-            return console.log('不支持window.navigator.camera');
+            if (PageFunc.isWeixin()) {
+              wx.chooseImage({
+                count: 1, // 默认9
+                sizeType: ['original', 'compressed'], // 可以指定是原图还是压缩图，默认二者都有
+                sourceType: wxCameraOptions, // 可以指定来源是相册还是相机，默认二者都有
+                success: function (res) {
+                  // console.log(res);
+                  // console.log(res.localIds);
+                  $scope.$apply(function () {
+                    $scope.imagePages[id] = $scope.imagePages[id] || [];
+                    $scope.imagePages[id][ $scope.imagePages[id].length ] = {
+                      subType: id,
+                      subTitle: $scope.uploadImages[id].title, 
+                      ImageUrl: res.localIds[0]
+                    };
+                    // $scope.imgs = $scope.imgs || [];
+                    // for (var i = 0; i < res.localIds.length; i++) {
+                    //   $scope.imgs.push({localId: res.localIds[i]});
+                    // }
+                    // $scope.imgs.push.apply($scope.imgs, res.localIds); // 返回选定照片的本地ID列表，localId可以作为img标签的src属性显示图片
+                  });
+                }
+              });
+              return true;
+            }
+            else {
+              return console.log('不支持window.navigator.camera');
+            }
           }
 
           $cordovaCamera.getPicture(cameraOptions).then(function(imageURI) {
@@ -1283,6 +1324,9 @@ angular.module('yiyangbao.services', ['ngResource'])
       hide: function(){
         $ionicLoading.hide();
       }
+    },
+    isWeixin: function () { 
+      return (/micromessenger/i).test(navigator.userAgent); 
     }
   };
 }])
