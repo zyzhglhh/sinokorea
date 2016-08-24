@@ -91,8 +91,8 @@ angular.module('yiyangbao.controllers.user', [])
 
 	$scope.lp = {
 		mobile: userInfo.mobile || '',
-		accidentDate: new Date(),
-		accidentSite: accidentSite,
+		// accidentDate: new Date(),
+		// accidentSite: accidentSite,
 		isReal: true,
 		bespokeLinker: userInfo.personalInfo.name,
 		bespokeTel: userInfo.mobile,
