@@ -19,9 +19,15 @@ angular.module('yiyangbao.controllers.user', [])
 	});
 
 	$scope.newMessageCount = 0;
+	$scope.getInProgressCount = true;
 	var initCount = function() {
 		Claim.getMessageCount().then(function(data) {
 			$scope.newMessageCount = data.count;
+		}, function(err) {
+			console.log(err);
+		});
+		Claim.getInProgressCount().then(function(data) {
+			$scope.getInProgressCount = parseInt(data.count);
 		}, function(err) {
 			console.log(err);
 		});
@@ -32,6 +38,9 @@ angular.module('yiyangbao.controllers.user', [])
 		doRefresh: function() {
 			initCount();			
 			$scope.$broadcast('scroll.refreshComplete');			
+		},
+		forbidMsg: function() {
+			PageFunc.message('当前有审核中的报案申请, 不能提交新的申请', 5000, '不能同时申请多个理赔');
 		}
 	};
 
@@ -193,6 +202,12 @@ angular.module('yiyangbao.controllers.user', [])
 			}).finally(function() {
 				PageFunc.loading.hide();
 			});
+		},
+		checkDate: function() {
+			if ($scope.lp.accidentDate > Date.now()) {
+				PageFunc.message('出险日期不能大于当前日期', 2000, '填写信息');
+				$scope.lp.accidentDate = undefined;
+			}
 		},
 		doRefresh: function() {
 			$scope.actions.getRelation();			

@@ -48,12 +48,19 @@
 		        <i class="icon ion-ios-arrow-right"></i>
 	    </ion-item>
 
-	    <ion-item class="item item-thumbnail-left item-icon-right" ui-sref="user.claiming" ui-sref-opts="{reload:true}">
+	    <ion-item class="item item-thumbnail-left item-icon-right" ui-sref="user.claiming" ui-sref-opts="{reload:true}" ng-if="!getInProgressCount">
 				<img src="img/navicon/apply.png" class="">
 				<h2 class="padding-top">我要理赔</h2>
 				<p>拍摄上传报销凭据，发起理赔</p>
 		        <i class="icon ion-ios-arrow-right"></i>
 	    </ion-item>
+	    <ion-item class="item item-thumbnail-left item-icon-right" ng-click="actions.forbidMsg()" ng-if="getInProgressCount">
+				<img src="img/navicon/apply.png" class="">
+				<h2 class="padding-top">我要理赔</h2>
+				<p>拍摄上传报销凭据，发起理赔</p>
+		        <i class="icon ion-ios-arrow-right"></i>
+	    </ion-item>
+
 	    <ion-item class="item item-thumbnail-left item-icon-right" ui-sref="user.claimschedule">
 				<img src="img/navicon/app01.png" class="">
 				<h2 class="padding-top">理赔进度查询</h2>

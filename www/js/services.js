@@ -206,6 +206,7 @@ angular.module('yiyangbao.services', ['ngResource'])
       getClaimInfo: {method: 'GET', params:{route: 'getClaimInfo'}, timeout: 10000},
       getClaims: {method: 'POST', params:{route: 'getClaims'}, timeout: 10000},
       getMessageCount: {method: 'GET', params:{route: 'getMessageCount'}, timeout: 10000},
+      getInProgressCount: {method: 'GET', params:{route: 'getInProgressCount'}, timeout: 10000},
       selfAddClaiming: {method: 'POST', params:{route: 'selfAddClaiming'}, timeout: 10000},
       addClaimEspush: {method: 'POST', params:{route: 'addEspush'}, timeout: 10000},
       getESPush: {method: 'POST', params:{route: 'getESPushs'}, timeout: 10000},
@@ -1108,6 +1109,16 @@ angular.module('yiyangbao.services', ['ngResource'])
   self.getMessageCount = function() {
     var deferred = $q.defer();
     Data.Claim.getMessageCount({},function(data, headers) {
+      deferred.resolve(data);
+    }, function(err) {
+      deferred.reject(err);
+    });
+    return deferred.promise;
+  };
+
+  self.getInProgressCount = function() {
+    var deferred = $q.defer();
+    Data.Claim.getInProgressCount({},function(data, headers) {
       deferred.resolve(data);
     }, function(err) {
       deferred.reject(err);
